@@ -18,7 +18,7 @@ int main(void) {
 
 	while (true) {
 		
-		//Testing sectio
+		//Testing section
 		printf("LED1 state: %s\n", led1.GetInternalPortState() == PortState::High ? "ON" : "OFF");
 		//Testing section end
 
