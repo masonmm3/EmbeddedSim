@@ -21,11 +21,11 @@ int main(void) {
 	while (true) {
 		led1.UpdateLED();
 
-		printf("LED1 state: %s\n", led1.GetInternalPortState(10) == PortState::High ? "ON" : "OFF");
-
-		esp.SetPort(10, state);
+		printf("LED1 state: %s\n", led1.GetInternalPortState() == PortState::High ? "ON" : "OFF");
 
 		state = !state;
+		
+		esp.SetPort(10, state);
 		
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}

@@ -9,7 +9,7 @@ class LED : public SimObject {
         
         void SetConnectedPort(ISimController* pController, int id);
 
-        PortState GetInternalPortState(int id) override;
+        PortState GetInternalPortState();
 
         void UpdateLED();
 };

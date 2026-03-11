@@ -16,7 +16,7 @@ class SimObject {
 
 		void SetConnectedPort(ISimController* pController);
 
-		virtual PortState GetInternalPortState(int id) = 0;
+		virtual PortState GetInternalPortState(int id) { return PortState::Low;};
 };
 
 #endif

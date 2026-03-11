@@ -11,7 +11,7 @@ void LED::SetConnectedPort(ISimController* pController, int id) {
     enabled = 0;
 }
 
-PortState LED::GetInternalPortState(int id) {
+PortState LED::GetInternalPortState() {
     return enabled ? PortState::High : PortState::Low;
 } 
 
