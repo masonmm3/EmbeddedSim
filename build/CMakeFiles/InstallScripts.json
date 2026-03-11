@@ -1,7 +1,7 @@
 {
 	"InstallScripts" : 
 	[
-		"C:/GitHub/EmbeddedSim/build/cmake_install.cmake"
+		"C:/Github/EmbeddedSim/build/cmake_install.cmake"
 	],
 	"Parallel" : false
 }

@@ -4,6 +4,12 @@
     <ClCompile Include="C:\GitHub\EmbeddedSim\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\GitHub\EmbeddedSim\src\Controllers\ESP32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\GitHub\EmbeddedSim\src\Objects\LED.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\GitHub\EmbeddedSim\src\SimController.h">
@@ -12,16 +18,22 @@
     <ClInclude Include="C:\GitHub\EmbeddedSim\src\SimObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="C:\GitHub\EmbeddedSim\src\Controllers\ESP32.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\GitHub\EmbeddedSim\src\Objects\LED.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\GitHub\EmbeddedSim\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{A5DB7E36-7687-30B7-AB49-57D31CC7B0C5}</UniqueIdentifier>
+      <UniqueIdentifier>{0566B15F-ED09-3436-BA44-304F0D845886}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{2CC0DF03-6952-3B55-81E9-AA94F60CEB8C}</UniqueIdentifier>
+      <UniqueIdentifier>{788CE63C-B0E4-3859-B875-08AE94A916C6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

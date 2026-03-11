@@ -8,6 +8,10 @@ set(SOURCE_FILES
     main.cpp 
     src/SimController.h 
     src/SimObject.h
+    src/Controllers/ESP32.hpp
+    src/Controllers/ESP32.cpp
+    src/Objects/LED.hpp
+    src/Objects/LED.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})

@@ -5,21 +5,19 @@
 #include <iostream>
 #include <bitset>
 #include <cstddef>
-#include "SimController.h"
+#include <map>
+#include "ISimController.h"
 
-
-
-template <size_t N>
 class SimObject {
 	protected:
-		*SimController controller;
+		std::map<int, ISimController*> ports;
 	public:
-		virtual ~SimController() = default;
+		virtual ~SimObject() = default;
 
-		virtual SetConnectedPort(*SimController Controller, std::initializer_list<int> ids);
+		void SetConnectedPort(ISimController* pController);
 
-		virtual internalPortState(int id);	
-}
+		virtual PortState GetInternalPortState(int id) = 0;
+};
 
 #endif
 
