@@ -9,7 +9,7 @@ void LED::SetConnectedPort(ISimController* pController, int id) {
         return;
     }
     
-    pController->SetCallback(std::bind(&LED::UpdateLED, this));
+    pController->SetCallback(std::bind(&LED::UpdateLED, this), id);
 
     enabled = 0;
 }

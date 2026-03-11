@@ -6,6 +6,7 @@
 #include <iostream>
 #include <bitset>
 #include <cstddef>
+#include <map>
 #include <vector>
 #include "ISimController.h"
 
@@ -13,15 +14,15 @@ template <size_t N>
 class SimController : public ISimController {
 	protected:
 		std::bitset<N> ports;
-		std::vector<std::function<void()>> callbacks;
+		std::map<int, std::function<void()>> callbacks;
 
 		/**
 		 * @brief runs the registered callbacks for this controller
 		 * 
 		 */
-		void runCallbacks() {
+		void runCallbacks(int port) {
 			for (const auto& callback : callbacks) {
-				callback();
+				callbacks[port]();
 			}
 		}
 
@@ -37,6 +38,7 @@ class SimController : public ISimController {
 		void SetPort(int port, PortState value) override{
 			if (port >= 0 && static_cast<std::size_t>(port) < N) {
             	ports[port] = (value == PortState::High);
+				runCallbacks(port);
         	}
 		}
 
@@ -48,7 +50,6 @@ class SimController : public ISimController {
 		*/
 		void SetPort(int port, int value) {
 			SetPort(port, value ? PortState::High : PortState::Low);
-			runCallbacks();
 		}
 
 		/**
@@ -61,7 +62,7 @@ class SimController : public ISimController {
 			if (port >= 0 && static_cast<std::size_t>(port) < N) {
 	            return ports.test(port) ? PortState::High : PortState::Low;
 	        }
-			runCallbacks();
+			runCallbacks(port);
 	        return PortState::Low;
 		}
 
@@ -70,8 +71,8 @@ class SimController : public ISimController {
 		 * 
 		 * @param callback 
 		 */
-		void SetCallback(std::function<void()> callback) override {
-			callbacks.push_back(callback);
+		void SetCallback(std::function<void()> callback, int port) override {
+			callbacks[port] = callback;
 		}
 
 		std::size_t GetPortCount() const override{

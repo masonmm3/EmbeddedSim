@@ -17,7 +17,7 @@ class ISimController {
         virtual PortState GetPort(int port) = 0;
         
         virtual void SetPortMode() = 0;
-        virtual void SetCallback(std::function<void()> callback) = 0;
+        virtual void SetCallback(std::function<void()> callback, int port) = 0;
         virtual std::size_t GetPortCount() const = 0;
 };
 
