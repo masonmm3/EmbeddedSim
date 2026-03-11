@@ -14,7 +14,7 @@ class Button : public SimObject {
         
         void SetConnectedPort(ISimController* pController, int HighId, int LowId);
 
-        PortState GetInternalPortState(bool HighSide);
+        PortState GetInternalPortState();
 
         void PushButton();
 

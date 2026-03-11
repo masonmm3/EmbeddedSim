@@ -29,7 +29,7 @@ int main(void) {
 
 		//Testing section
 		printf("LED1 state: %s\n", led1.GetInternalPortState() == PortState::High ? "ON" : "OFF");
-		printf("Button state: %s\n", button1.GetInternalPortState(true) == PortState::High ? "Pushed" : "Not Pushed");
+		printf("Button state: %s\n", button1.GetInternalPortState() == PortState::High ? "Pushed" : "Not Pushed");
 		printf("Port 2 State: %s\n", esp.GetPort(2) == PortState::High ? "HIGH" : "LOW");
 		//Testing section end
 
@@ -37,7 +37,9 @@ int main(void) {
 
 		esp.SetPort(10, state);
 		
-		button1.PushButton();
+		if (state) {
+			button1.PushButton();
+		}
 
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}

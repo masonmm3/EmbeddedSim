@@ -15,18 +15,12 @@ void Button::SetConnectedPort(ISimController* pController, int HighId, int LowId
     pController->SetCallback(std::bind(&Button::UpdateButton, this), LowId);
 }
 
-PortState Button::GetInternalPortState(bool HighSide) {
-    if (HighSide) {
-        bool state = pushed ? HighSide || LowSide : HighSide;
-        return state ? PortState::High : PortState::Low;
-    } else if (LowSide) {
-        bool state = pushed ? HighSide || LowSide : HighSide;
-        return state ? PortState::High : PortState::Low;
-    }
+PortState Button::GetInternalPortState() {
+   return HighSide && LowSide ? PortState::High : PortState::Low;
 } 
 
 void Button::PushButton() {
-    pushed = true;
+    
     if (HighSide && !LowSide) {
        LowSide = HighSide; 
        shortLow = true;
@@ -41,17 +35,13 @@ void Button::PushButton() {
 }
 
 void Button::UpdateButton() {
-
-    HighSide = ports[HighId]->GetPort(HighId);
-    LowSide = ports[LowId]->GetPort(LowId);
-
-    if (shortHigh && !pushed) {
+    if (shortHigh) {
         HighSide = false;
         shortHigh = false;
         ports[HighId]->SetPort(HighId, PortState::Low);
     }
 
-    if (shortLow && !pushed) {
+    if (shortLow) {
         LowSide = false;
         shortLow = false;
         ports[LowId]->SetPort(LowId, PortState::Low);
