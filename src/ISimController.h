@@ -10,15 +10,15 @@ enum PortState {
 };
 
 class ISimController {
-public:
-    virtual ~ISimController() = default;
+    public:
+        virtual ~ISimController() = default;
 
-    virtual void SetPort(int port, PortState value) = 0;
-    virtual PortState GetPort(int port) = 0;
-    
-    virtual void SetPortMode() = 0;
-    virtual void SetCallback(std::function<void()> callback) = 0;
-    virtual std::size_t GetPortCount() const = 0;
+        virtual void SetPort(int port, PortState value) = 0;
+        virtual PortState GetPort(int port) = 0;
+        
+        virtual void SetPortMode() = 0;
+        virtual void SetCallback(std::function<void()> callback) = 0;
+        virtual std::size_t GetPortCount() const = 0;
 };
 
 #endif
