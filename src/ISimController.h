@@ -16,8 +16,6 @@ public:
     virtual void SetPort(int port, PortState value) = 0;
     virtual PortState GetPort(int port) const = 0;
     
-    virtual void Init() = 0;
-    virtual void DeInit() = 0;
     virtual void SetPortMode() = 0;
     virtual std::size_t GetPortCount() const = 0;
 };

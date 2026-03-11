@@ -10,8 +10,6 @@ int main(void) {
 
 	ESP32 esp;
 
-	esp.Init();
-
 	LED led1;
 
 	led1.SetConnectedPort((ISimController*)&esp, 10);
@@ -24,7 +22,7 @@ int main(void) {
 		printf("LED1 state: %s\n", led1.GetInternalPortState() == PortState::High ? "ON" : "OFF");
 
 		state = !state;
-		
+
 		esp.SetPort(10, state);
 		
 		std::this_thread::sleep_for(std::chrono::seconds(1));

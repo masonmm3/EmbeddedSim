@@ -35,10 +35,7 @@ class SimController : public ISimController {
 			return N;
 		}
 		
-		virtual void SetPortMode() override = 0;
-		virtual void Init() override = 0;
-		virtual void DeInit() override = 0;
-	
+		virtual void SetPortMode() override = 0;	
 };
 
 #endif
