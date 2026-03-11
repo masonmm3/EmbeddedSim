@@ -8,6 +8,9 @@ void LED::SetConnectedPort(ISimController* pController, int id) {
         std::cerr << "Invalid port ID " << id << " for LED connection.\n";
         return;
     }
+    
+    pController->SetCallback(std::bind(&LED::UpdateLED, this));
+
     enabled = 0;
 }
 

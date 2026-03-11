@@ -2,6 +2,7 @@
 #define ISIM_CONTROLLER_H
 
 #include <cstddef>
+#include <functional>
 
 enum PortState {
 	Low = 0,
@@ -12,11 +13,11 @@ class ISimController {
 public:
     virtual ~ISimController() = default;
 
-    // Use virtual methods that don't depend on the template <N>
     virtual void SetPort(int port, PortState value) = 0;
-    virtual PortState GetPort(int port) const = 0;
+    virtual PortState GetPort(int port) = 0;
     
     virtual void SetPortMode() = 0;
+    virtual void SetCallback(std::function<void()> callback) = 0;
     virtual std::size_t GetPortCount() const = 0;
 };
 
