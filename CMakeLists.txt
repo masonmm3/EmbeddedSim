@@ -12,8 +12,8 @@ set(SOURCE_FILES
     src/Controllers/ESP32.cpp
     src/Objects/LED.hpp
     src/Objects/LED.cpp
-    src/Objects/Button.hpp
-    src/Objects/Button.cpp
+    src/Objects/Switch.hpp
+    src/Objects/Switch.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})

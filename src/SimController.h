@@ -7,6 +7,10 @@
 #include <bitset>
 #include <cstddef>
 #include <map>
+#include <thread>
+#include <chrono>
+#include <mutex>
+#include <atomic>
 #include <vector>
 #include "ISimController.h"
 
@@ -15,19 +19,32 @@ class SimController : public ISimController {
 	protected:
 		std::bitset<N> ports;
 		std::map<int, std::function<void()>> callbacks;
+		
+		std::mutex mtx;
+		std::thread worker;
+    	std::atomic<bool> running{true};
 
-		/**
-		 * @brief runs the registered callbacks for this controller
-		 * 
-		 */
-		void runCallbacks(int port) {
-			for (const auto& callback : callbacks) {
-				callbacks[port]();
+		void workerLoop(int intervalMs) {
+			while (running) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(intervalMs));
+				std::lock_guard<std::mutex> lock(mtx);
+				for (auto const& callback : callbacks) {
+					if (callback.second) callback.second();
+				}
 			}
 		}
 
 	public:
-		virtual ~SimController() = default;
+		SimController(int intervalMs = 100) {
+			worker = std::thread(&SimController::workerLoop, this, intervalMs);
+		}
+
+		virtual ~SimController() {
+			running = false;
+			if (worker.joinable()) {
+				worker.join();
+			}
+		}
 
 		/**
 		 * @brief Set the value of a port on the controller
@@ -38,7 +55,6 @@ class SimController : public ISimController {
 		void SetPort(int port, PortState value) override{
 			if (port >= 0 && static_cast<std::size_t>(port) < N) {
             	ports[port] = (value == PortState::High);
-				runCallbacks(port);
         	}
 		}
 
@@ -62,7 +78,6 @@ class SimController : public ISimController {
 			if (port >= 0 && static_cast<std::size_t>(port) < N) {
 	            return ports.test(port) ? PortState::High : PortState::Low;
 	        }
-			runCallbacks(port);
 	        return PortState::Low;
 		}
 
@@ -72,6 +87,7 @@ class SimController : public ISimController {
 		 * @param callback 
 		 */
 		void SetCallback(std::function<void()> callback, int port) override {
+			std::lock_guard<std::mutex> lock(mtx);
 			callbacks[port] = callback;
 		}
 

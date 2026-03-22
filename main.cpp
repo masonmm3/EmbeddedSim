@@ -1,7 +1,8 @@
 #include "src/ISimController.h"
+#include "src/Objects/Switch.hpp"
 #include "src/controllers/Esp32.hpp"
 #include "src/Objects/LED.hpp"
-#include "src/Objects/Button.hpp"
+#include "src/Objects/Switch.hpp"
 
 
 #include <thread>
@@ -17,9 +18,9 @@ int main(void) {
 
 	led1.SetConnectedPort((ISimController*)&esp, 10);
 
-	Button button1;
+	Switch switch1;
 
-	button1.SetConnectedPort((ISimController*)&esp, 1, 2);
+	switch1.SetConnectedPort((ISimController*)&esp, 1, 2);
 
 	bool state = 0;
 
@@ -29,7 +30,7 @@ int main(void) {
 
 		//Testing section
 		printf("LED1 state: %s\n", led1.GetInternalPortState() == PortState::High ? "ON" : "OFF");
-		printf("Button state: %s\n", button1.GetInternalPortState() == PortState::High ? "Pushed" : "Not Pushed");
+		printf("Button Pushed: %s\n", switch1.GetInternalPortState() == PortState::High ? "YES" : "NO");
 		printf("Port 2 State: %s\n", esp.GetPort(2) == PortState::High ? "HIGH" : "LOW");
 		//Testing section end
 
@@ -38,7 +39,7 @@ int main(void) {
 		esp.SetPort(10, state);
 		
 		if (state) {
-			button1.PushButton();
+			switch1.SwapSwitch();
 		}
 
 		std::this_thread::sleep_for(std::chrono::seconds(1));
