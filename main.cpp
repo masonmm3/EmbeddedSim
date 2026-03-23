@@ -1,8 +1,4 @@
-#include "src/ISimController.h"
-#include "src/Objects/Switch.hpp"
-#include "src/controllers/Esp32.hpp"
-#include "src/Objects/LED.hpp"
-#include "src/Objects/Switch.hpp"
+#include "src/EmbeddedSim.h"
 
 
 #include <thread>
