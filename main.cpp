@@ -16,15 +16,15 @@ int main(void) {
 
 	LED led1;
 
-	led1.SetConnectedPort((ISimController*)&esp, 10);
+	led1.SetConnectedPort(&esp, 10);
 
 	Switch switch1;
 
-	switch1.SetConnectedPort((ISimController*)&esp, 1, 2);
+	switch1.SetConnectedPort(&esp, 1, 2);
 
 	LED led2;
 
-	led2.SetConnectedPort((ISimController*)&esp, 8);
+	led2.SetConnectedPort(&esp, 8);
 
 	bool state = 0;
 
