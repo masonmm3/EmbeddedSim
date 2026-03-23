@@ -1,21 +1,23 @@
 #include "Switch.hpp"
+#include <iostream>
 
 void Switch::SetConnectedPort(ISimController* pController, int HighId, int LowId) {
-    ports[HighId] = pController;
-    ports[LowId] = pController;
-    this->HighId = HighId;
-    this->LowId = LowId;
-
-    if (HighId < 0 || HighId >= pController->GetPortCount() || LowId < 0 || LowId >= pController->GetPortCount()) {
-        std::cerr << "Invalid port ID for Button connection.\n";
+    if (!pController || HighId < 0 || LowId < 0 || static_cast<std::size_t>(HighId) >= pController->GetPortCount() || static_cast<std::size_t>(LowId) >= pController->GetPortCount()) {
+        std::cerr << "Invalid connection attempt for Switch on ports " << HighId << " or " << LowId << "\n";
         return;
     }
 
-    pController->SetCallback(std::bind(&Switch::UpdateSwitch, this), HighId);
-    pController->SetCallback(std::bind(&Switch::UpdateSwitch, this), LowId);
+    this->HighId = HighId;
+    this->LowId = LowId;
+    ports[HighId] = pController;
+    ports[LowId] = pController;
+
+    auto callback = [this]() { this->UpdateSwitch(); };
+    pController->SetCallback(HighId, callback);
+    pController->SetCallback(LowId, callback);
 }
 
-PortState Switch::GetInternalPortState() {
+PortState Switch::GetInternalPortState() const {
    return closed ? PortState::High : PortState::Low;
 } 
 
@@ -35,6 +37,9 @@ void Switch::DisableSwitch() {
 }
 
 void Switch::UpdateSwitch() {
+    if (isUpdating) return;
+    isUpdating = true;
+
     if (shortHigh && !closed)  {
         ports[HighId]->SetPort(HighId, PortState::Low);
         shortHigh = false;
@@ -52,6 +57,8 @@ void Switch::UpdateSwitch() {
         ports[LowId]->SetPort(LowId, PortState::High);
         shortLow = true;
     }
+
+    isUpdating = false;
 }
 
 

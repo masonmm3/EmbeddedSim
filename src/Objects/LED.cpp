@@ -1,25 +1,32 @@
 #include "LED.hpp"
+#include <iostream>
 
 void LED::SetConnectedPort(ISimController* pController, int id) {
+    if (!pController || id < 0 || static_cast<std::size_t>(id) >= pController->GetPortCount()) {
+        std::cerr << "Invalid connection attempt for LED on port " << id << "\n";
+        return;
+    }
+
+    this->portId = id;
     ports[id] = pController;
-    this->id = id;
     
     if (id < 0 || id >= pController->GetPortCount()) {
         std::cerr << "Invalid port ID " << id << " for LED connection.\n";
         return;
     }
     
-    pController->SetCallback(std::bind(&LED::UpdateLED, this), id);
+    pController->SetCallback(id, std::bind(&LED::UpdateLED, this));
 
-    enabled = 0;
+    UpdateLED();
 }
 
-PortState LED::GetInternalPortState() {
+PortState LED::GetInternalPortState() const {
     return enabled ? PortState::High : PortState::Low;
 } 
 
 void LED::UpdateLED() {
-    if (ports[id]) {
-        enabled = ports[id]->GetPort(id) == PortState::High;
+    ISimController* port = ports[portId];
+    if (port) {
+        enabled = port->GetPort(portId) == PortState::High;
     }
 }

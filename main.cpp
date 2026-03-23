@@ -5,6 +5,8 @@
 #include <chrono>
 #include <cstdio>
 
+using namespace std;
+
 
 int main(void) {
 
@@ -47,7 +49,7 @@ int main(void) {
 
 		esp.SetPort(8, esp.GetPort(2));
 
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		this_thread::sleep_for(chrono::seconds(1));
 	}
 
 	return 0;

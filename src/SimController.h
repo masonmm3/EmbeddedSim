@@ -11,6 +11,7 @@
 #include <chrono>
 #include <mutex>
 #include <atomic>
+#include <utility>
 #include <vector>
 #include "ISimController.h"
 
@@ -19,14 +20,15 @@ class SimController : public ISimController {
 	protected:
 		std::bitset<N> ports;
 		std::map<int, std::function<void()>> callbacks;
-		
 		std::mutex mtx;
+    	std::atomic<bool> running{false};
 		std::thread worker;
-    	std::atomic<bool> running{true};
 
 		void workerLoop(int intervalMs) {
-			while (running) {
+			while (running.load(std::memory_order_acquire)) 
+			{
 				std::this_thread::sleep_for(std::chrono::milliseconds(intervalMs));
+
 				std::lock_guard<std::mutex> lock(mtx);
 				for (auto const& callback : callbacks) {
 					if (callback.second) callback.second();
@@ -35,12 +37,12 @@ class SimController : public ISimController {
 		}
 
 	public:
-		SimController(int intervalMs = 100) {
+		SimController(int intervalMs = 100) : running(true) {
 			worker = std::thread(&SimController::workerLoop, this, intervalMs);
 		}
 
 		virtual ~SimController() {
-			running = false;
+			running.store(false, std::memory_order_release);
 			if (worker.joinable()) {
 				worker.join();
 			}
@@ -52,7 +54,7 @@ class SimController : public ISimController {
 		 * @param port 
 		 * @param value 
 		 */
-		void SetPort(int port, PortState value) override{
+		void SetPort(std::size_t port, PortState value) override{
 			if (port >= 0 && static_cast<std::size_t>(port) < N) {
             	ports[port] = (value == PortState::High);
         	}
@@ -64,7 +66,7 @@ class SimController : public ISimController {
 		* @param port 
 		* @param value
 		*/
-		void SetPort(int port, int value) {
+		void SetPort(std::size_t port, std::size_t value) {
 			SetPort(port, value ? PortState::High : PortState::Low);
 		}
 
@@ -74,7 +76,7 @@ class SimController : public ISimController {
 		 * @param port 
 		 * @return PortState 
 		 */
-		PortState GetPort(int port) override {
+		PortState GetPort(std::size_t port) override {
 			if (port >= 0 && static_cast<std::size_t>(port) < N) {
 	            return ports.test(port) ? PortState::High : PortState::Low;
 	        }
@@ -86,9 +88,9 @@ class SimController : public ISimController {
 		 * 
 		 * @param callback 
 		 */
-		void SetCallback(std::function<void()> callback, int port) override {
+		void SetCallback( std::size_t port, std::function<void()> callback) override {
 			std::lock_guard<std::mutex> lock(mtx);
-			callbacks[port] = callback;
+			callbacks[port] = std::move(callback);
 		}
 
 		std::size_t GetPortCount() const override{
