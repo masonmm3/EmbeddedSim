@@ -22,6 +22,10 @@ int main(void) {
 
 	switch1.SetConnectedPort((ISimController*)&esp, 1, 2);
 
+	LED led2;
+
+	led2.SetConnectedPort((ISimController*)&esp, 8);
+
 	bool state = 0;
 
 	esp.SetPort(1, 1);
@@ -32,6 +36,9 @@ int main(void) {
 		printf("LED1 state: %s\n", led1.GetInternalPortState() == PortState::High ? "ON" : "OFF");
 		printf("Button Pushed: %s\n", switch1.GetInternalPortState() == PortState::High ? "YES" : "NO");
 		printf("Port 2 State: %s\n", esp.GetPort(2) == PortState::High ? "HIGH" : "LOW");
+		printf("LED2 state: %s\n", led2.GetInternalPortState() == PortState::High ? "ON" : "OFF");
+
+		printf("\n");
 		//Testing section end
 
 		state = !state;
@@ -41,6 +48,8 @@ int main(void) {
 		if (state) {
 			switch1.SwapSwitch();
 		}
+
+		esp.SetPort(8, esp.GetPort(2));
 
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}

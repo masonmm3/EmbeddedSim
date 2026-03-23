@@ -21,14 +21,17 @@ PortState Switch::GetInternalPortState() {
 
 void Switch::SwapSwitch() {
     closed = !closed;
+    UpdateSwitch();
 }
 
 void Switch::EnableSwitch() {
     closed = true;
+    UpdateSwitch();
 }
 
 void Switch::DisableSwitch() {
     closed = false;
+    UpdateSwitch();
 }
 
 void Switch::UpdateSwitch() {
