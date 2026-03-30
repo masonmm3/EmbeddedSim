@@ -1,5 +1,5 @@
 #pragma once
-#include "../SimObject.h"
+#include "../EmbeddedSimLib/SimObject.h"
 
 class Switch : public SimObject {
     private:

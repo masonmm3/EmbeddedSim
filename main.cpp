@@ -1,4 +1,5 @@
 #include "src/EmbeddedSim.h"
+#include "src/Objects/PWMReader.hpp"
 
 
 #include <thread>
@@ -28,6 +29,10 @@ int main(void) {
 
 	esp.SetPort(1, 1);
 
+	PWMReader reader;
+
+	reader.SetConnectedPort(&esp, 5);
+
 	while (true) {
 
 		//Testing section
@@ -35,6 +40,8 @@ int main(void) {
 		printf("Button Pushed: %s\n", switch1.GetInternalPortState() == PortState::High ? "YES" : "NO");
 		printf("Port 2 State: %s\n", esp.GetPort(2) == PortState::High ? "HIGH" : "LOW");
 		printf("LED2 state: %s\n", led2.GetInternalPortState() == PortState::High ? "ON" : "OFF");
+		printf("PWM cycle: %f\n", reader.GetPWMCycle());
+		printf("Delta Time: %lld nano seconds\n", esp.GetDeltaTimeNs());
 
 		printf("\n");
 		//Testing section end
@@ -48,6 +55,8 @@ int main(void) {
 		}
 
 		esp.SetPort(8, esp.GetPort(2));
+
+		esp.SetPortPWM(5, 90);
 
 		this_thread::sleep_for(chrono::seconds(1));
 	}

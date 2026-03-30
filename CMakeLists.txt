@@ -14,6 +14,8 @@ set(SOURCE_FILES
     src/Objects/LED.cpp
     src/Objects/Switch.hpp
     src/Objects/Switch.cpp
+    src/Objects/PWMReader.cpp
+    src/Objects/PWMReader.hpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})

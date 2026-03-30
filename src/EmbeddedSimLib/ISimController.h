@@ -19,6 +19,7 @@ class ISimController {
         virtual void SetPortMode() = 0;
         virtual void SetCallback(std::size_t port, std::function<void()> callback) = 0;
         virtual std::size_t GetPortCount() const = 0;
+        virtual long long GetDeltaTimeNs() const = 0;
 };
 
 #endif

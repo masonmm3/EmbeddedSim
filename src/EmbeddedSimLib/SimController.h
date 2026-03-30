@@ -20,25 +20,58 @@ class SimController : public ISimController {
 	protected:
 		std::bitset<N> ports;
 		std::map<int, std::function<void()>> callbacks;
+		std::vector<std::function<void()>> controllerCallbacks;
 		std::mutex mtx;
     	std::atomic<bool> running{false};
 		std::thread worker;
+		long long deltaTimeNs = 0;
+		
 
-		void workerLoop(int intervalMs) {
+		void workerLoop(int intervalMicroseconds) {
+			auto lastTime = std::chrono::high_resolution_clock::now();
+
 			while (running.load(std::memory_order_acquire)) 
 			{
-				std::this_thread::sleep_for(std::chrono::milliseconds(intervalMs));
+				// helpers
+				auto currentTime = std::chrono::high_resolution_clock::now();
+				std::chrono::duration<float> loopTime = currentTime - lastTime;
+				lastTime = currentTime;
 
+				deltaTimeNs = static_cast<long long>(loopTime.count() * 1'000'000'000LL);
+
+				preciseSleep(std::chrono::microseconds(intervalMicroseconds));
+
+				//loop logic
 				std::lock_guard<std::mutex> lock(mtx);
 				for (auto const& callback : callbacks) {
 					if (callback.second) callback.second();
 				}
+
+				for (auto const& callback : controllerCallbacks) {
+					if (callback) callback();
+				}
+			}
+		}
+
+		template <typename Rep, typename Period>
+		void preciseSleep(std::chrono::duration<Rep, Period> duration) {
+			auto start = std::chrono::high_resolution_clock::now();
+			
+			double seconds = std::chrono::duration<double>(duration).count();
+
+			if (seconds > 0.002) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(
+					static_cast<long long>(seconds * 1000) - 2));
+			}
+
+			while (std::chrono::high_resolution_clock::now() - start < duration) {
+				std::this_thread::yield();
 			}
 		}
 
 	public:
-		SimController(int intervalMs = 100) : running(true) {
-			worker = std::thread(&SimController::workerLoop, this, intervalMs);
+		SimController(int intervalMicroseconds = 1) : running(true), deltaTimeNs(0) {
+			worker = std::thread(&SimController::workerLoop, this, intervalMicroseconds);
 		}
 
 		virtual ~SimController() {
@@ -91,6 +124,10 @@ class SimController : public ISimController {
 		void SetCallback( std::size_t port, std::function<void()> callback) override {
 			std::lock_guard<std::mutex> lock(mtx);
 			callbacks[port] = std::move(callback);
+		}
+
+		long long GetDeltaTimeNs() const override {
+			return deltaTimeNs;
 		}
 
 		std::size_t GetPortCount() const override{
