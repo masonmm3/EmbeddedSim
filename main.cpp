@@ -1,6 +1,4 @@
 #include "src/EmbeddedSim.h"
-#include "src/Objects/Motor.hpp"
-#include "src/Objects/PWMReader.hpp"
 
 
 #include <thread>
@@ -9,42 +7,27 @@
 
 using namespace std;
 
+ESP32 esp;
+LED led1;
+Switch switch1;
+LED led2;
+PWMReader reader;
+Motor motor; 
+
+void SetupObjects();
 
 int main(void) {
 
-	ESP32 esp;
-
-	LED led1;
-
-	led1.SetConnectedPort(&esp, 10);
-
-	Switch switch1;
-
-	switch1.SetConnectedPort(&esp, 1, 2);
-
-	LED led2;
-
-	led2.SetConnectedPort(&esp, 8);
-
+	SetupObjects();
 	bool state = 0;
-
-	esp.SetPort(1, 1);
-
-	PWMReader reader;
-
-	reader.SetConnectedPort(&esp, 5);
-
-	Motor motor; 
-
-	motor.SetConnectedPort(&esp, 6);
 
 	while (true) {
 
 		//Testing section
-		printf("LED1 state: %s\n", led1.GetInternalPortState() == PortState::High ? "ON" : "OFF");
-		printf("Button Pushed: %s\n", switch1.GetInternalPortState() == PortState::High ? "YES" : "NO");
-		printf("Port 2 State: %s\n", esp.GetPort(2) == PortState::High ? "HIGH" : "LOW");
-		printf("LED2 state: %s\n", led2.GetInternalPortState() == PortState::High ? "ON" : "OFF");
+		printf("LED1 state: %s\n", led1.GetInternalPortState() == PORT_HIGH ? "ON" : "OFF");
+		printf("Button Pushed: %s\n", switch1.GetInternalPortState() == PORT_HIGH ? "YES" : "NO");
+		printf("Port 2 State: %s\n", esp.GetPort(2) == PORT_HIGH ? "HIGH" : "LOW");
+		printf("LED2 state: %s\n", led2.GetInternalPortState() == PORT_HIGH ? "ON" : "OFF");
 		printf("PWM cycle: %f\n", reader.GetPWMCycle());
 		printf("Delta Time: %lld nano seconds\n", esp.GetDeltaTimeNs());
 		printf("Motor Speed %f", motor.GetSpeed());
@@ -69,4 +52,18 @@ int main(void) {
 	}
 
 	return 0;
+}
+
+void SetupObjects() {
+	led1.SetConnectedPort(&esp, 10);
+
+	switch1.SetConnectedPort(&esp, 1, 2);
+
+	led2.SetConnectedPort(&esp, 8);
+
+	esp.SetPort(1, 1);
+
+	reader.SetConnectedPort(&esp, 5);
+
+	motor.SetConnectedPort(&esp, 6);
 }

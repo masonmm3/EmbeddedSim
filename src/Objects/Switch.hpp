@@ -17,5 +17,4 @@ class Switch : public SimObject {
         void EnableSwitch();
         void DisableSwitch();
         void UpdateSwitch();
-        
 };
