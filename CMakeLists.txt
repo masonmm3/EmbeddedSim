@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.24)
 
 project(EmbeddedSim)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+
+add_subdirectory(extern/pybind11)
+
 set(SOURCE_FILES 
     main.cpp 
     src/EmbeddedSimLib/SimController.h 
@@ -16,6 +21,14 @@ set(SOURCE_FILES
     src/Objects/PWMReader.hpp
     src/Objects/Motor.hpp
     src/Objects/Motor.cpp
+    src/PythonWrapper.cpp
 )
 
+pybind11_add_module(EmbeddedSimLib ${SOURCE_FILES})
+
+
+target_link_libraries(EmbeddedSimLib PRIVATE pybind11::module)
+
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE pybind11::embed)

@@ -57,3 +57,7 @@ void PWMReader::calculateDutyCycle() {
 float PWMReader::GetPWMCycle() {
     return currentCycle;
 }
+
+PortState PWMReader::GetInternalPortState() const {
+    return controller ? controller->GetPort(portId) : PortState::Low;
+}

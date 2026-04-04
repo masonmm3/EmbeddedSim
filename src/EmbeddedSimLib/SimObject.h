@@ -2,7 +2,6 @@
 #define SIM_OBJECT_H
 
 #include <cstddef>
-#include <memory>
 #include <map>
 #include "ISimController.h"
 
@@ -13,7 +12,9 @@ class SimObject {
 	public:
 		virtual ~SimObject() = default;
 
-		void SetConnectedPort(ISimController* pController);
+		void SetConnectedPort(ISimController* pController) {
+			return;
+		};
 
 		virtual PortState GetInternalPortState(std::size_t id) { return PortState::Low;};
 };
