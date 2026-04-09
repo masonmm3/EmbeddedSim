@@ -15,6 +15,7 @@ PWMReader reader;
 Motor motor; 
 
 void SetupObjects();
+void RunTests();
 
 int main(void) {
 
@@ -24,15 +25,7 @@ int main(void) {
 	while (true) {
 
 		//Testing section
-		printf("LED1 state: %s\n", led1.GetInternalPortState() == PORT_HIGH ? "ON" : "OFF");
-		printf("Button Pushed: %s\n", switch1.GetInternalPortState() == PORT_HIGH ? "YES" : "NO");
-		printf("Port 2 State: %s\n", esp.GetPort(2) == PORT_HIGH ? "HIGH" : "LOW");
-		printf("LED2 state: %s\n", led2.GetInternalPortState() == PORT_HIGH ? "ON" : "OFF");
-		printf("PWM cycle: %f\n", reader.GetPWMCycle());
-		printf("Delta Time: %lld nano seconds\n", esp.GetDeltaTimeNs());
-		printf("Motor Speed %f", motor.GetSpeed());
-
-		printf("\n");
+		RunTests();
 		//Testing section end
 
 		state = !state;
@@ -52,6 +45,18 @@ int main(void) {
 	}
 
 	return 0;
+}
+
+void RunTests() {
+	printf("LED1 state: %s\n", led1.GetInternalPortState() == PORT_HIGH ? "ON" : "OFF");
+		printf("Button Pushed: %s\n", switch1.GetInternalPortState() == PORT_HIGH ? "YES" : "NO");
+		printf("Port 2 State: %s\n", esp.GetPort(2) == PORT_HIGH ? "HIGH" : "LOW");
+		printf("LED2 state: %s\n", led2.GetInternalPortState() == PORT_HIGH ? "ON" : "OFF");
+		printf("PWM cycle: %f\n", reader.GetPWMCycle());
+		printf("Delta Time: %lld nano seconds\n", esp.GetDeltaTimeNs());
+		printf("Motor Speed %f\n", motor.GetSpeed());
+
+		printf("\n");
 }
 
 void SetupObjects() {
