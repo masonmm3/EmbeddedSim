@@ -4,6 +4,9 @@
 #include <cstddef>
 #include <functional>
 
+#include "SimEvent.h"
+#include "EventDispatcher.h"
+
 enum PortState {
 	Low = 0,
 	High = 1,
@@ -20,6 +23,10 @@ class ISimController {
         virtual void SetCallback(std::size_t port, std::function<void()> callback) = 0;
         virtual std::size_t GetPortCount() const = 0;
         virtual long long GetDeltaTimeNs() const = 0;
+
+        virtual void AttachInterrupt(std::size_t port, std::function<void()> isr, InterruptMode mode) = 0;
+        virtual void DetachInterrupt(std::size_t port) = 0;
+        virtual EventDispatcher& GetEventDispatcher() = 0;
 };
 
 #endif

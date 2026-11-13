@@ -9,6 +9,8 @@ add_subdirectory(extern/pybind11)
 
 set(SOURCE_FILES 
     main.cpp 
+    src/EmbeddedSimLib/SimEvent.h
+    src/EmbeddedSimLib/EventDispatcher.h
     src/EmbeddedSimLib/SimController.h 
     src/EmbeddedSimLib/SimObject.h
     src/Controllers/ESP32.hpp

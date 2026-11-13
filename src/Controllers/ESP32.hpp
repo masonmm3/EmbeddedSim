@@ -16,6 +16,8 @@ class ESP32 : public SimController<35> {
 
 		using SimController<35>::SetPort;
 		using SimController<35>::GetPort;
+		using SimController<35>::AttachInterrupt;
+		using SimController<35>::DetachInterrupt;
 		
 		void SetPortMode() override;
 		void SetPortPWM(std::size_t port, uint8_t dutyCycle);
