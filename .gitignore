@@ -35,3 +35,5 @@
 build/
 .cache/
 extern/
+__pycache__/
+*.pyc

@@ -36,8 +36,6 @@ int main(void) {
 			switch1.SwapSwitch();
 		}
 
-		esp.SetPort(8, esp.GetPort(2));
-
 		esp.SetPortPWM(5, 90);
 		esp.SetPortPWM(6, 90);
 
@@ -65,6 +63,10 @@ void SetupObjects() {
 	switch1.SetConnectedPort(&esp, 1, 2);
 
 	led2.SetConnectedPort(&esp, 8);
+
+	esp.AttachInterrupt(2, []() {
+		esp.SetPort(8, esp.GetPort(2));
+	}, InterruptMode::Change);
 
 	esp.SetPort(1, 1);
 

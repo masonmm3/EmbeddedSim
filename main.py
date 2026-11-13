@@ -16,6 +16,8 @@ def setup_simulation():
     
     led2.set_connected_port(esp, 8)
     
+    esp.attach_interrupt(2, lambda: esp.set_port(8, esp.get_port(2)), EmbeddedSim.InterruptMode.Change)
+    
     esp.set_port(1, EmbeddedSim.PortState.High)
     
     reader.set_connected_port(esp, 5)
@@ -42,8 +44,6 @@ def run_loop():
             
             if state:
                 switch1.swap_switch()
-
-            esp.set_port(8, esp.get_port(2))
 
             esp.set_port_pwm(5, 90)
             esp.set_port_pwm(6, 90)

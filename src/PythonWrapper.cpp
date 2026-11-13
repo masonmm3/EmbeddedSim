@@ -4,12 +4,22 @@
 
 namespace py = pybind11;
 
-void BindESP32(pybind11::module_& m) {
+void BindTypes(pybind11::module_& m) {
     py::enum_<PortState>(m, "PortState")
         .value("Low", PortState::Low)
         .value("High", PortState::High)
         .export_values();
 
+    py::enum_<InterruptMode>(m, "InterruptMode")
+        .value("Rising", InterruptMode::Rising)
+        .value("Falling", InterruptMode::Falling)
+        .value("Change", InterruptMode::Change)
+        .value("Low", InterruptMode::Low)
+        .value("High", InterruptMode::High)
+        .export_values();
+}
+
+void BindESP32(pybind11::module_& m) {
     py::class_<ESP32PWM>(m, "ESP32PWM")
         .def_readwrite("port", &ESP32PWM::port)
         .def_readwrite("dutyCycle", &ESP32PWM::dutyCycle)
@@ -34,12 +44,28 @@ public:
     void SetCallback(std::size_t port, std::function<void()> callback) override { PYBIND11_OVERRIDE_PURE(void, ISimController, SetCallback, port, callback); }
     std::size_t GetPortCount() const override { PYBIND11_OVERRIDE_PURE(std::size_t, ISimController, GetPortCount); }
     long long GetDeltaTimeNs() const override { PYBIND11_OVERRIDE_PURE(long long, ISimController, GetDeltaTimeNs); }
+    void AttachInterrupt(std::size_t port, std::function<void()> isr, InterruptMode mode) override {
+        PYBIND11_OVERRIDE_PURE(void, ISimController, AttachInterrupt, port, isr, mode);
+    }
+    void DetachInterrupt(std::size_t port) override {
+        PYBIND11_OVERRIDE_PURE(void, ISimController, DetachInterrupt, port);
+    }
+    EventDispatcher& GetEventDispatcher() override {
+        PYBIND11_OVERRIDE_PURE(EventDispatcher&, ISimController, GetEventDispatcher);
+    }
 };
 
 void BindISimController(py::module &m) {
     py::class_<ISimController, PyISimController>(m, "ISimController")
         .def("get_port_count", &ISimController::GetPortCount)
-        .def("get_delta_time_ns", &ISimController::GetDeltaTimeNs);
+        .def("get_delta_time_ns", &ISimController::GetDeltaTimeNs)
+        .def("attach_interrupt", [](ISimController& self, std::size_t port, py::object isr, InterruptMode mode) {
+            self.AttachInterrupt(port, [isr]() {
+                py::gil_scoped_acquire acquire;
+                isr();
+            }, mode);
+        }, py::arg("port"), py::arg("isr"), py::arg("mode") = InterruptMode::Change)
+        .def("detach_interrupt", &ISimController::DetachInterrupt, py::arg("port"));
 }
 
 template <size_t N>
@@ -55,7 +81,14 @@ void DeclareSimController(py::module &m, const std::string &typestr) {
         .def("get_port", &Class::GetPort)
         .def("set_callback", &Class::SetCallback)
         .def("get_delta_time_ns", &Class::GetDeltaTimeNs)
-        .def("get_port_count", &Class::GetPortCount);
+        .def("get_port_count", &Class::GetPortCount)
+        .def("attach_interrupt", [](Class& self, std::size_t port, py::object isr, InterruptMode mode) {
+            self.AttachInterrupt(port, [isr]() {
+                py::gil_scoped_acquire acquire;
+                isr();
+            }, mode);
+        }, py::arg("port"), py::arg("isr"), py::arg("mode") = InterruptMode::Change)
+        .def("detach_interrupt", &Class::DetachInterrupt, py::arg("port"));
 }
 
 void BindSimControllerBase(py::module &m) {
@@ -149,6 +182,7 @@ void BindObjects(py::module &m) {
 PYBIND11_MODULE(EmbeddedSimLib, m, py::mod_gil_not_used()) {
     m.doc() = "EmbeddedSim Plugin bindings for python"; 
 
+    BindTypes(m);
     BindISimController(m);
     BindSimControllerBase(m);
     BindESP32(m);

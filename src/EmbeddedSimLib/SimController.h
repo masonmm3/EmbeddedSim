@@ -24,7 +24,7 @@ class SimController : public ISimController {
     	std::atomic<bool> running{false};
 		std::thread worker;
 		long long deltaTimeNs = 0;
-		
+		EventDispatcher eventDispatcher;
 
 		void workerLoop(int intervalMicroseconds) {
 			auto lastTime = std::chrono::high_resolution_clock::now();
@@ -86,10 +86,21 @@ class SimController : public ISimController {
 		 * @param port 
 		 * @param value 
 		 */
-		void SetPort(std::size_t port, PortState value) override{
-			if (port >= 0 && static_cast<std::size_t>(port) < N) {
-            	ports[port] = (value == PortState::High);
-        	}
+		void SetPort(std::size_t port, PortState value) override {
+			if (port < N) {
+				bool oldState = ports.test(port);
+				bool newState = (value == PortState::High);
+				ports[port] = newState;
+
+				if (oldState != newState) {
+					eventDispatcher.Emit(SimEvent{
+						EventSource::GPIO,
+						port,
+						static_cast<uint32_t>(oldState),
+						static_cast<uint32_t>(newState)
+					});
+				}
+			}
 		}
 
 		/**
@@ -109,7 +120,7 @@ class SimController : public ISimController {
 		 * @return PortState 
 		 */
 		PortState GetPort(std::size_t port) override {
-			if (port >= 0 && static_cast<std::size_t>(port) < N) {
+			if (port < N) {
 	            return ports.test(port) ? PortState::High : PortState::Low;
 	        }
 	        return PortState::Low;
@@ -131,6 +142,37 @@ class SimController : public ISimController {
 
 		std::size_t GetPortCount() const override{
 			return N;
+		}
+
+		void AttachInterrupt(std::size_t port, std::function<void()> isr, InterruptMode mode) override {
+			if (port >= N) return;
+			DetachInterrupt(port);
+			if (!isr) return;
+
+			eventDispatcher.Subscribe(EventSource::GPIO, port, [isr = std::move(isr), mode](const SimEvent& ev) {
+				bool rising = (!ev.data1 && ev.data2);
+				bool falling = (ev.data1 && !ev.data2);
+
+				bool trigger = (mode == InterruptMode::Change) ||
+				               (mode == InterruptMode::Rising && rising) ||
+				               (mode == InterruptMode::Falling && falling) ||
+				               (mode == InterruptMode::High && ev.data2) ||
+				               (mode == InterruptMode::Low && !ev.data2);
+
+				if (trigger) {
+					isr();
+				}
+			});
+		}
+
+		void DetachInterrupt(std::size_t port) override {
+			if (port < N) {
+				eventDispatcher.Unsubscribe(EventSource::GPIO, port);
+			}
+		}
+
+		EventDispatcher& GetEventDispatcher() override {
+			return eventDispatcher;
 		}
 		
 		virtual void SetPortMode() override = 0;
