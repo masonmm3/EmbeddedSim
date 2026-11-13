@@ -59,6 +59,12 @@ void BindISimController(py::module &m) {
     py::class_<ISimController, PyISimController>(m, "ISimController")
         .def("get_port_count", &ISimController::GetPortCount)
         .def("get_delta_time_ns", &ISimController::GetDeltaTimeNs)
+        .def("attach_interrupt", [](ISimController& self, std::size_t port, py::object isr, InterruptMode mode) {
+            self.AttachInterrupt(port, [isr]() {
+                py::gil_scoped_acquire acquire;
+                isr();
+            }, mode);
+        }, py::arg("port"), py::arg("isr"), py::arg("mode") = InterruptMode::Change)
         .def("detach_interrupt", &ISimController::DetachInterrupt, py::arg("port"));
 }
 
